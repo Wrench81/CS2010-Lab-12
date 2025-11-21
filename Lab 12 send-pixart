@@ -1,0 +1,17 @@
+local function black()
+local req = http.post("https://cedar.fogcloud.org/api/logs/2BC0", "line=black")
+end
+
+local function white()
+local req = http.post("https://cedar.fogcloud.org/api/logs/2BC0", "line=white")
+end
+
+ok, data = turtle.inspectDown()
+if ok then
+  print(data.name)
+  if data.name==("minecraft:white_concrete") then 
+      white()
+      else
+      black()
+      end
+end

@@ -1,1 +1,71 @@
+local function getBlockDataFromURL()
 
+local response = http.get("https://cedar.fogcloud.org/api/logs/2BC0")
+  if not response then
+    print("Failed to receive data from URL")
+    return nil
+  end
+    local data = response.readAll()
+    response.close()
+    return data
+  end
+
+local function placeBlockBasedOnData(blockData)
+
+if blockData == "white" then
+    if turtle.getItemCount() > 0 then
+        turtle.placeDown()
+    else
+        print("No blocks to place")
+      end
+elseif blockData == "black" then
+    print("Received black - no placement action")
+  else
+    print("Unknown data received: " .. tostring(blockData))
+  end
+end
+
+local function scanAndPlace()
+
+local blockData = getBlockDataFromURL()
+  if blockData then
+    print("Received data: " .. blockData)
+    placeBlockBasedOnData(blockData)
+  else
+    print("No data received from URL")
+  end
+end
+
+local blocks_to_move = 1
+  local turns_taken = 0
+    local total_blocks_placed = 0
+      if turtle.getItemCount() == 0 then
+      print("No blocks in inventory! Please load blocks into turtle.")
+    return
+  end
+
+while total_blocks_placed < 25 do
+  for i = 1, blocks_to_move do
+    if total_blocks_placed < 25 then
+        scanAndPlace()
+        total_blocks_placed = total_blocks_placed + 1
+      end
+    if total_blocks_placed < 25 then
+        if turtle.forward() then
+       else
+            print("Cannot move forward. Stopping placement.")
+            return
+        end
+    end
+end
+if total_blocks_placed >= 25 then
+    break
+  end
+turtle.turnRight()
+turns_taken = turns_taken + 1
+if turns_taken % 2 == 0 then
+    blocks_to_move = blocks_to_move + 1
+  end
+end
+
+print("Placement complete. Total blocks placed: " .. total_blocks_placed)

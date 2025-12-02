@@ -1,1 +1,57 @@
+local function black()
+    local req = http.post("https://cedar.fogcloud.org/api/logs/2BC0", "line=black")
+end
 
+local function white()
+    local req = http.post("https://cedar.fogcloud.org/api/logs/2BC0", "line=white")
+end
+
+local function scanAndLog()
+    local ok, data = turtle.inspectDown()
+    if ok then
+        print("Scanned: " .. data.name)
+        if data.name == ("minecraft:white_concrete") then
+            white()
+        else
+            black()
+        end
+    else
+        print("Scanned: Air/Nothing")
+        black()
+    end
+end
+
+local blocks_to_move = 1
+local turns_taken = 0
+local total_blocks_scanned = 0
+
+while total_blocks_scanned < 25 do
+    for i = 1, blocks_to_move do
+        if total_blocks_scanned < 25 then
+            scanAndLog()
+            total_blocks_scanned = total_blocks_scanned + 1
+        end
+
+        if total_blocks_scanned < 25 then
+            if turtle.forward() then
+            else
+                
+                print("Cannot move forward. Stopping scan.")
+                return
+            end
+        end
+    end
+    
+    if total_blocks_scanned >= 25 then
+        break
+    end
+
+    turtle.turnRight()
+    turns_taken = turns_taken + 1
+
+    if turns_taken % 2 == 0 then
+        blocks_to_move = blocks_to_move + 1
+    end
+end
+
+print("Scan complete. Total blocks scanned: " .. total_blocks_scanned)
